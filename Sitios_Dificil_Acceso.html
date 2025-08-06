@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sitios de difícil acceso</title>
+  <style>
+    :root {
+      --bg:#f5f7fa;
+      --card:#fff;
+      --radius:8px;
+      --shadow:0 8px 24px rgba(0,0,0,0.08);
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+    }
+    body {
+      margin:0;
+      background: var(--bg);
+      min-height:100vh;
+      padding:1rem;
+      box-sizing:border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.5rem;
+    }
+    .controls {
+      width: 100%;
+      max-width: 480px;
+      display:flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom:1rem;
+    }
+    .search-group {
+      width: 100%;
+      display:flex;
+      gap:.25rem;
+    }
+   input[type="text"] {
+  padding: 12px;
+  font-size: 18px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  padding: 12px 20px;
+  font-size: 18px;
+  margin-left: 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #007BFF;
+  color: white;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+    button.secondary {
+      background:#475569;
+      width: 200px;
+      justify-content: center;
+    }
+    button.secondary:hover {
+      background:#334155;
+    }
+    .modal-backdrop {
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.7);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:1rem;
+      z-index:100;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .3s ease;
+    }
+    .modal-backdrop.active {
+      opacity:1;
+      pointer-events:auto;
+    }
+    .modal {
+      position:relative;
+      background:#1f2937;
+      border-radius:10px;
+      max-width:90vw;
+      max-height:90vh;
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      box-sizing:border-box;
+      color:#fff;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      transform: scale(0.9);
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .modal-backdrop.active .modal {
+      transform: scale(1);
+      opacity: 1;
+    }
+    .modal img {
+      width: auto;
+      height: auto;
+      max-width: 90vw;
+      max-height: 75vh;
+      object-fit: contain;
+      border-radius: 6px;
+      background: #111;
+      display: block;
+      margin: 0 auto;
+    }
+    .modal-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .modal-title {
+      font-weight:600;
+      font-size:1rem;
+    }
+    .close-btn {
+      background:none;
+      border:none;
+      color:#fff;
+      font-size:1.25rem;
+      cursor:pointer;
+      padding:4px;
+      line-height:1;
+      user-select:none;
+    }
+    .nav-buttons {
+      display:flex;
+      gap:8px;
+      margin-top:4px;
+      justify-content:center;
+      align-items:center;
+    }
+    .nav-buttons button {
+      background:rgba(255,255,255,0.1);
+      border:none;
+      padding:6px 12px;
+      border-radius:6px;
+      cursor:pointer;
+      color:#fff;
+      font-size:.8rem;
+      transition: background-color 0.2s ease;
+    }
+    .nav-buttons button:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+    .nav-buttons button:hover:not(:disabled) {
+      background:rgba(255,255,255,0.3);
+    }
+    .caption {
+      font-size:.8rem;
+      margin-top:4px;
+      text-align:center;
+      user-select:none;
+    }
+    #site-list .site-item {
+      padding:8px 12px;
+      cursor:pointer;
+      font-size:.9rem;
+      border-bottom:1px solid #e2e8f0;
+      user-select:none;
+      color: #1f2937;
+      background: #fff;
+      border-radius: 4px;
+      margin: 4px 0;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    #site-list .site-item:last-child {
+      border-bottom: none;
+    }
+    #site-list .site-item:hover {
+      background-color: #2563eb;
+      color: white;
+    }
+    #download-csv-btn {
+      margin-top: 8px;
+      background: #10b981;
+      width: 100%;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    #download-csv-btn:hover {
+      background: #059669;
+    }
+
+.primary {
+  background-color: #007BFF;
+  color: white;
+  padding: 10px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.primary:hover {
+  background-color: #0056b3;
+}
+
+
+  </style>
+</head>
+<body>
+  <div class="controls">
+
+<h2 style="margin-bottom: 1rem; font-size: 1.5rem; font-weight: bold; text-align: center;">Sitio de difícil acceso / Propiedad privada / Acceso restringido</h2>
+
+<div class="search-group">
+  <input id="search-input" placeholder="Buscar por ID o nombre..." autocomplete="off" />
+  <button id="search-btn">🔍 Buscar</button>
+</div>
+
+<div style="display: flex; gap: 0.5rem;">
+  <button id="open-sites-btn" class="primary">📍 Lista de Sitios</button>
+  <button id="open-private-btn" class="primary">🔒 Sitios en propiedad privada</button>
+</div>
+
+  </div>
+
+  <!-- Modal Imagen -->
+  <div id="modal-backdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">Título</div>
+        <button class="close-btn" aria-label="Cerrar" id="close-modal">&times;</button>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <img id="modal-img" src="" alt="Imagen ampliada" />
+        <div class="nav-buttons">
+          <button id="prev-btn">&larr; Anterior</button>
+          <button id="next-btn">Siguiente &rarr;</button>
+        </div>
+        <div class="caption" id="modal-caption"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Lista de Sitios -->
+  <div id="site-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <div class="modal-title">Lista de Sitios</div>
+        <button class="close-btn" id="close-site-modal">&times;</button>
+      </div>
+      <div id="site-list" style="max-height:300px; overflow:auto; padding:6px 0;"></div>
+      <button id="download-csv-btn">⬇️ Descargar lista (.csv)</button>
+    </div>
+  </div>
+
+<div id="private-modal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <div class="modal-title">Sitios en Propiedad Privada</div>
+      <button class="close-btn" id="close-private-modal">&times;</button>
+    </div>
+    <div id="private-site-list" style="max-height:300px; overflow:auto; padding:6px 0;"></div>
+  </div>
+</div>
+
+
+
+  <script>
+    const imagenesData = [
+       {
+        id: "411846",
+        name: "NODO CERRO EL TUMA",
+        fotos: ["https://www.dropbox.com/scl/fi/9svkts8fdvnbduo5xx1nx/411846.jpg?rlkey=qloij98cl53ad65ff3gu5br4f&st=3hza411c&raw=1"]
+      },
+      {
+        id: "411566",
+        name: "VIJILLAS 1",
+        fotos: ["https://www.dropbox.com/scl/fi/1m5umcox66k1kaioxn7i4/411566.jpg?rlkey=i5abupztmjmagf3ife888tqv5&st=gdcit0pc&raw=1"]
+      },   
+      {
+        id: "411613",
+        name: "VILLA SIQUIA",
+        fotos: ["https://www.dropbox.com/scl/fi/mkurwctvs5emfymzc9zye/411613.jpg?rlkey=pxiabfgdqyehbemotnr7gb2k1&st=um8mv04i&raw=1"]
+      },   
+      {
+        id: "411704",
+        name: "CUATRO ESQUINAS RÍO BLANCO",
+        fotos: ["https://www.dropbox.com/scl/fi/30gw8pnbiubvky0pv54ar/411704.jpg?rlkey=6tat2n0eutjnfq7tdubybso4x&st=hs67y8r2&raw=1"]
+      },      
+      
+      {
+        id: "411563",
+        name: "CASAS VIEJAS",
+        fotos: ["https://www.dropbox.com/scl/fi/69pmgmyn70i4w86jmqpdp/411563.jpg?rlkey=1yv75n6usvy4bzvdvyl3k38pq&st=6utvo34v&raw=1"]
+      },      
+      
+      {
+        id: "411744",
+        name: "LA PISTA EMPALME SAN JUAN",
+        fotos: ["https://www.dropbox.com/scl/fi/t1437zuvf3kbvxq3gj8xo/411744.jpg?rlkey=w022zbcoac8iipl1lxx6iured&st=x0sau1gy&raw=1"]
+      },      
+      
+      {
+        id: "411822",
+        name: "PANALI",
+        fotos: ["https://www.dropbox.com/scl/fi/s5zcw0u1m91xvrp6hl70l/411822.jpg?rlkey=0gjy2yjq6kuermo1s5y9ecjv7&st=drvjvwah&raw=1"]
+      },      
+      
+      {
+        id: "411606",
+        name: "ROSA GRANDE",
+        fotos: ["https://www.dropbox.com/scl/fi/9d8k1nqgfbt7bgjks67mz/411606.jpg?rlkey=hu8ti7yj3y0upc94kg3zfhshz&st=eak4htmw&raw=1"]
+      },      
+      
+      {
+        id: "411293",
+        name: "REPETIDOR VESUBIO",
+        fotos: ["https://www.dropbox.com/scl/fi/x4n7nx426bqv4jigj68vs/411293.jpg?rlkey=pji1oh31ejvdahm40eiqpxsir&st=0e96ufon&raw=1"]
+      },      
+      
+      {
+        id: "411721",
+        name: "CUSULI",
+        fotos: ["https://www.dropbox.com/scl/fi/7pwlynpcy8xarh6kj5r8j/411721.jpg?rlkey=9o5m4g1if7sy85l18ou5cx4h9&st=bwr0lnda&raw=1"]
+      },  
+
+      {
+        id: "411720",
+        name: "ZINICA LA TUMBA",
+        fotos: ["https://www.dropbox.com/scl/fi/evevdfesl4rrgmtp0ijcv/411720.jpg?rlkey=hig9h1q72fpytq1v7mthpu994&st=wvprz6ck&raw=1"]
+      },  
+
+      {
+        id: "412131",
+        name: "GUZMA",
+        fotos: ["https://www.dropbox.com/scl/fi/g2d815ckizqskufjjbks7/412131.jpg?rlkey=cmba0jclsyg522rmontlxhdwt&st=euz5gtp0&raw=1"]
+      },  
+
+      {
+        id: "411191",
+        name: "SASHA GRAYTOWN",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/e26zbvt5n9qnediub6a0w/411191.jpg?rlkey=1umuf1iiwi39j6nqnlz3aklhd&st=86s600gi&raw=1",
+          "https://www.dropbox.com/scl/fi/z6d3nqnm48j47xwwajy4c/411191_2.jpg?rlkey=z9j2bgny7fealpgtqrgv6r8tk&st=a4r015hc&raw=1"
+        ]
+      },
+
+      {
+        id: "412126",
+        name: "WASLALA 2",
+        fotos: ["https://www.dropbox.com/scl/fi/oshvgx6k5u8oznzz129cz/412126.jpg?rlkey=zhynsl0429larx5irnkqr6f6i&st=2aex0mcn&raw=1"]
+      }, 
+
+      {
+        id: "413003",
+        name: "MICRO NODO LAPAN",
+      fotos: [
+          "https://www.dropbox.com/scl/fi/qny7b6najoyynlft1rsum/413003.jpg?rlkey=k6p0xf3yuw2e4kc6t8ddop1hk&st=amo358ub&raw=1",
+          "https://www.dropbox.com/scl/fi/hu274y9trec28qx4hpjx7/413003_2.jpg?rlkey=f99e1693tyev4yvtrfdvsu9is&st=649pml3f&raw=1"
+        ]
+      }, 
+
+      {
+        id: "411604",
+        name: "COPERNA",
+        fotos: ["https://www.dropbox.com/scl/fi/nyv77anrkw1rqpstkmszr/411604.jpg?rlkey=quw447z9yig7ehm3hqicm4kl4&st=t9rqvz3f&raw=1"]
+      }, 
+
+      {
+        id: "411600",
+        name: "EL TORO",
+        fotos: ["https://www.dropbox.com/scl/fi/qbu2jmk233c7iov07p6or/411600.jpg?rlkey=xkivz52hwq5gldmfmjfgxatja&st=a6691hbr&raw=1"]
+      }, 
+
+      {
+        id: "411831",
+        name: "EL DANTO",
+        fotos: ["https://www.dropbox.com/scl/fi/zwzgo25umc2lsm35033ky/411831.jpg?rlkey=v24bqd6tr0bk6zz6w7vnsup0w&st=vu2hycoj&raw=1"]
+      }, 
+
+      {
+        id: "411834",
+        name: "EL TRIUNFO",
+        fotos: ["https://www.dropbox.com/scl/fi/8uucrna63x7n2uhjio9sc/411834.jpg?rlkey=32undc8qltn9eyw1z38mgrau5&st=f1b3bmmf&raw=1"]
+      }, 
+
+      {
+        id: "411185",
+        name: "EL VESUBIO",
+        fotos: ["https://www.dropbox.com/scl/fi/bl3lx6vzc1b2ykin2tmfu/411185.jpg?rlkey=v2bocyq26ku9d0bd8rtrids11&st=ko8to4it&raw=1"]
+      }, 
+
+      {
+        id: "411163",
+        name: "EL NARANJO WASLALA",
+        fotos: ["https://www.dropbox.com/scl/fi/3mewkenaq07s87oapm0fe/411163.jpg?rlkey=97hhbrxslr52ahms0xp5iryi9&st=62uexk09&raw=1"]
+      }, 
+
+      {
+        id: "411569",
+        name: "TRUSLAYA",
+        fotos: ["https://www.dropbox.com/scl/fi/khn34ufnqib4tly3nbn36/411569.jpg?rlkey=wbr0tn8b6eu9kchvffesr13vs&st=fm8vl87g&raw=1"]
+      }, 
+
+      {
+        id: "NG-20001-641",
+        name: "REPETIDOR KUBALI",
+        fotos: ["https://www.dropbox.com/scl/fi/10w3obx371v76ywq2br9q/NG-20001-641.jpg?rlkey=diecy9zuqyss11rkmt0hdwks2&st=2d725sfz&raw=1"]
+      }, 
+ 
+      {
+        id: "411404",
+        name: "SAN MARCO DE NASAHUE",
+        fotos: ["https://www.dropbox.com/scl/fi/86hv5lv5da00kmcr2ce1s/411404.jpg?rlkey=gfh9uac5dmvwecwg73vdk2ccb&st=lf4le5p7&raw=1"]
+      }, 
+
+      {
+        id: "411568",
+        name: "EL GUINEO",
+        fotos: ["https://www.dropbox.com/scl/fi/4s5j1af208eh15bhzbss6/411568.jpg?rlkey=mjmncwmlr6lixrn46hl9zzjie&st=79wlbemo&raw=1"]
+      }, 
+
+      {
+        id: "412133",
+        name: "WIWASKASKITA",
+        fotos: ["https://www.dropbox.com/scl/fi/2tp6oflvyoajd0h4usoct/412133.jpg?rlkey=esh2114u1x1f4mayjhe9jlfdv&st=u5g7yq5z&raw=1"]
+      }, 
+
+      {
+        id: "412127",
+        name: "SANTA RITA SIUNA",
+        fotos: ["https://www.dropbox.com/scl/fi/zsfzfjfpvt61o1nt3arxz/412127.jpg?rlkey=sp7q5kzkjawy668ok28jnsf6l&st=vdrnzhcs&raw=1"]
+      }, 
+
+      {
+        id: "411703",
+        name: "PUEBLO NUEVO RIO BLANCO",
+        fotos: ["https://www.dropbox.com/scl/fi/1d3ia9iw2lr7en6yjwxwx/411703.jpg?rlkey=j6236tpupkcsyphnjcb1yfgbr&st=q2qtxkx5&raw=1"]
+      }, 
+
+      {
+        id: "411837",
+        name: "TADAZNA",
+        fotos: ["https://www.dropbox.com/scl/fi/d4cbge8scdqi49duqic2x/411837.jpg?rlkey=qcca8s3dqm3q1cxee8s37woej&st=z9eje542&raw=1"]
+      }, 
+
+      {
+        id: "411564",
+        name: "BRASILIA",
+        fotos: ["https://www.dropbox.com/scl/fi/y6ao7i3yv0c55mw2uexq3/411564.jpg?rlkey=vw8mgp91raft7jbtyy8zaxjma&st=lz96m2es&raw=1"]
+      }, 
+
+      {
+        id: "411565",
+        name: "SAN ANTONIO SITIO HISTORICO",
+        fotos: ["https://www.dropbox.com/scl/fi/nctcrk0wimxhaqwo2fc7v/411565.jpg?rlkey=sg0j1ffhnaz3uxw4geau2nbn6&st=7svf4122&raw=1"]
+      }, 
+
+      {
+        id: "411427",
+        name: "REPETIDOR WANAWAS",
+        fotos: ["https://www.dropbox.com/scl/fi/p61fiw8dd3kzduq3oyahj/411427.jpg?rlkey=p7whmy02tk59sryjayjzfa5us&st=2rne3zfh&raw=1"]
+      }, 
+
+      {
+        id: "411425",
+        name: "REPETIDOR CERRO EL GALLO",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/k1tqh8pzf1d1ihvhy22pn/411425_1.jpg?rlkey=z0vpi5agvgrdpyxnuir1u5wv8&st=p5mygiqp&raw=1",
+          "https://www.dropbox.com/scl/fi/ahdspqhftcsbx0m4uekkx/411425_2.jpg?rlkey=s1yzvpxgkebh96aamsykx2j9c&st=gag1xnvj&raw=1"
+        ]
+      },
+
+      {
+        id: "411169",
+        name: "PLAN DE GRAMA",
+        fotos: ["https://www.dropbox.com/scl/fi/7lk8c8bh3jek6owegk0os/411169.jpg?rlkey=el8tvb4b06wgamcikuqy36s4z&st=aqx5nt2i&raw=1"]
+      }, 
+
+      {
+        id: "411381",
+        name: "EL CONSUELO",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/qtk1a0j9i0o8khlsw9pil/411381.jpg?rlkey=5vde454frfk22cwc7snn2y51a&st=wjm1rl0r&raw=1",
+          "https://www.dropbox.com/scl/fi/gvt8a7zuyqckaz8ijilqd/411381_2.jpg?rlkey=4i7hp8bvrazr1lolq8n0wtn44&st=6p76hzea&raw=1",
+          "https://www.dropbox.com/scl/fi/25l1r6x7ia5n234n4ypfw/411381_3.jpg?rlkey=pqqnt099ibif3im015olbc09p&st=vctvgk9v&raw=1"         
+        ]
+      }, 
+
+      {
+        id: "411178",
+        name: "ROSARIO NUEVA SEGOVIA",
+        fotos: ["https://www.dropbox.com/scl/fi/c0xqmrupjnxpxa04t5x9r/411178.jpg?rlkey=y4t78k21xgpe1k9bps4w6f159&st=9gfo5nfo&raw=1"]
+      },
+
+      {
+        id: "410369",
+        name: "SAN SEBASTIAN DE YALI",
+        fotos: ["https://www.dropbox.com/scl/fi/kp3vlemjijhavj0320gcw/410369.jpg?rlkey=ku0fxgjnfpjg1mt23zicxb1b6&st=28hbpmbu&raw=1"]
+      },
+
+      {
+        id: "411216",
+        name: "REPETIDOR AYAPAL",
+        fotos: ["https://www.dropbox.com/scl/fi/t9cbr4iz2ufitofi9ws1r/411216.jpg?rlkey=42jh73zzc1vkjdibw374domsn&st=w7dssc7p&raw=1"]
+      },
+
+      {
+        id: "411088",
+        name: "WIWILI DE JINOTEGA",
+        fotos: ["https://www.dropbox.com/scl/fi/n593la5v589qz8r14nutw/411088.jpg?rlkey=2xd8izxpj296bk48cx5b05mil&st=x8po724k&raw=1"]
+      },
+
+      {
+        id: "411379",
+        name: "WAMBLAN",
+        fotos: ["https://www.dropbox.com/scl/fi/nbsc6p3m1s4mja2mynzyw/411379.jpg?rlkey=9liyrmv2n83su49lkgrei2ls3&st=mgur7hjq&raw=1"]
+      },
+
+      {
+        id: "411730",
+        name: "JUCUAPA",
+        fotos: ["https://www.dropbox.com/scl/fi/r60wlugw6cd4g08vkp7u1/411730.jpg?rlkey=bm9bo8fupfmwekqr35so6yu4o&st=yn6zksch&raw=1"]
+      },
+
+      {
+        id: "411745",
+        name: "EL CARMEN JINOTEGA",
+        fotos: ["https://www.dropbox.com/scl/fi/5e5s16mufq7ij5cll1iwb/411745.jpg?rlkey=txd7lbbhu3v63m0lapkxnvwff&st=fixy45lo&raw=1"]
+      },
+
+      {
+        id: "411740",
+        name: "SAN PEDRO DE KININOWAS",
+        fotos: ["https://www.dropbox.com/scl/fi/okw873r0zni54bpbc2vne/411740.jpg?rlkey=fpsh7e0s5y5rlvo2bbkrr54nb&st=l36yh0y7&raw=1"]
+      },
+
+      {
+        id: "411161",
+        name: "MOLINO SUR",
+        fotos: ["https://www.dropbox.com/scl/fi/jmhkf36l5m9ggxsfcioom/411161.jpg?rlkey=4ebnf01yzks9qetillcqixdle&st=1j0ebkaz&raw=1"]
+      },
+
+      {
+        id: "NG-20001-737",
+        name: "REPETIDOR WAMBLAN",
+        fotos: ["https://www.dropbox.com/scl/fi/04zpvh05mcxzzyofzyhd4/NG-20001-737.jpg?rlkey=7u4b9rerm2bnweswfkjs7po56&st=m9yqusfm&raw=1"]
+      },
+
+      {
+        id: "411735",
+        name: "YAHOSKA",
+        fotos: ["https://www.dropbox.com/scl/fi/n8js91pc6w7gcwwlc7qha/411735.jpg?rlkey=xxbi3sb2ay6egj8qr9iydbq80&st=9eahduln&raw=1"]
+      },
+
+      {
+        id: "410254",
+        name: "EL TUMA",
+        fotos: ["https://www.dropbox.com/scl/fi/a3hw03sxk6aytejk81sjm/410254.jpg?rlkey=f7lhy8n253tsn5pxp01wce2o4&st=ytpphjp7&raw=1"]
+      },
+
+      {
+        id: "NG-20001-639",
+        name: "REPETIDOR KUKAWAS - LAS BRISAS",
+        fotos: ["https://www.dropbox.com/scl/fi/s8u8qm5w0j56n9xi4i8b9/NG-20001-639.jpg?rlkey=zo03t4309yas99coois9wjkue&st=bb95n4ps&raw=1"]
+      },
+
+      {
+        id: "411141",
+        name: "SAN ANTONIO KUSKAWAS",
+        fotos: ["https://www.dropbox.com/scl/fi/9gu1xy1tba9bv7x4lvls1/411141.jpg?rlkey=u4uil8ube2tcbfelngggcqdh9&st=hw8320x7&raw=1"]
+      },
+
+      {
+        id: "NG-20001-642",
+        name: "REPETIDOR EL ROSARIO",
+        fotos: ["https://www.dropbox.com/scl/fi/9ormwxjs3m3vtcoz337va/NG-20001-642.jpg?rlkey=o2pl6wphehrs0fi4gs0su7s8f&st=wdy2sdc0&raw=1"]
+      },
+
+      {
+        id: "410376",
+        name: "EL CARMEN - EL COMEJEN RANCHO GRANDE 2",
+        fotos: ["https://www.dropbox.com/scl/fi/av71fyctp8vkgmzqi4q90/410376.jpg?rlkey=hotg0l75155ntqk1l1qlln9k2&st=ejwrk88f&raw=1"]
+      },
+
+      {
+        id: "412157",
+        name: "LAS TORRES",
+        fotos: ["https://www.dropbox.com/scl/fi/ybpa57unxw7gxopnge3i5/412157.jpg?rlkey=85yhhnz50ns4k23sd6jk8if48&st=sgrcff6o&raw=1"]
+      },
+
+      {
+        id: "411548",
+        name: "MALECONCITO",
+        fotos: ["https://www.dropbox.com/scl/fi/0driguvtwiib3j65jinzk/411548.jpg?rlkey=2hqasc04sm42282zitl4y0wsa&st=se3xgyds&raw=1"]
+      },
+
+      {
+        id: "411558",
+        name: "MOTUSE LAS PINTADAS",
+        fotos: ["https://www.dropbox.com/scl/fi/ap0iwlw5m5gipjdtxa3vt/411558.jpg?rlkey=57nx74vhlhj2pa4gfvnpqdtke&st=2rcsqf1p&raw=1"]
+      },
+
+      {
+        id: "411597",
+        name: "FILA GRANDE 1",
+        fotos: ["https://www.dropbox.com/scl/fi/bwk2wmxuksxqlqfn7pisa/411597.jpg?rlkey=8p6a75wjco8x4cwx7ki48nzn8&st=ndf4gp2z&raw=1"]
+      },
+
+      {
+        id: "411562",
+        name: "VALLE SAN JUAN",
+        fotos: ["https://www.dropbox.com/scl/fi/o54nxooxpbh5dro96ru4c/411562.jpg?rlkey=dus96vk4u57shfa7k6brtcz0s&st=k5pjcycj&raw=1"]
+      },
+
+      {
+        id: "411599",
+        name: "EL CACAO",
+        fotos: ["https://www.dropbox.com/scl/fi/fudazuj2eo8ax0zb8ljh0/411599.jpg?rlkey=fbukbnb7am7ouocak54qbvd5z&st=40l6o137&raw=1"]
+      },
+
+      {
+        id: "NG-10014-00",
+        name: "BUENA VISTA - MATAGALPA",
+        fotos: ["https://www.dropbox.com/scl/fi/dtxeten2w3fcktglvt5jo/NG-10014-00.jpg?rlkey=23xjzqtt78puhi2xcx4nlhdsw&st=18vy3bg1&raw=1"]
+      },
+
+      {
+        id: "411376",
+        name: "EL BOTE",
+        fotos: ["https://www.dropbox.com/scl/fi/vds5q1gtg55wmqqzan2yn/411376.jpg?rlkey=n6h2wkl9tnyah7w4uqqtctshe&st=idp1n6ac&raw=1"]
+      },
+
+      {
+        id: "411803",
+        name: "SAMARCANDA",
+        fotos: ["https://www.dropbox.com/scl/fi/3f5m0z3f72q7xibed801z/411803.jpg?rlkey=r2k8ro3vksbw49i6eeb9070s7&st=k64c3hyt&raw=1"]
+      },
+
+      {
+        id: "411378",
+        name: "LA PITA EL CARMEN",
+        fotos: ["https://www.dropbox.com/scl/fi/qxl39mipdjae4xx0l4nh4/411378.jpg?rlkey=77jfhxebdlbcvdvpknno9m1tx&st=unfpfpfl&raw=1"]
+      },
+
+      {
+        id: "410840",
+        name: "NODO TX ALAMIKAMBA",
+        fotos: ["https://www.dropbox.com/scl/fi/uzmnenkglvotvonbjaefl/410840.jpg?rlkey=pyb3vknwyut2yuqa96dwrah35&st=eswurjo3&raw=1"]
+      },
+
+      {
+        id: "411182",
+        name: "LAS BRISAS",
+        fotos: ["https://www.dropbox.com/scl/fi/kt9lzrxw5mkhsjyl1jkfh/411182.jpg?rlkey=x4eth3do0ibjl4cn5v1mccjbn&st=08qit7ej&raw=1"]
+      },
+
+      {
+        id: "411980",
+        name: "KUKALAYA COLA BLANCA",
+        fotos: ["https://www.dropbox.com/scl/fi/qxf04x17nymcgm64ljw4p/411980.jpg?rlkey=5l6cqzs4pvz1b4u7dw2fr19e8&st=xyqu4rqm&raw=1"]
+      },
+
+      {
+        id: "411807",
+        name: "PALO VERDE",
+        fotos: ["https://www.dropbox.com/scl/fi/gnz591m57pkt4yg876z2j/411807.jpg?rlkey=m77li9rk9igoxprjtz9ndf3bw&st=ayeeel99&raw=1"]
+      },
+
+      {
+        id: "410056",
+        name: "CONDEGA",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/09gnuo83h5xq3sgq1skw6/410056.jpg?rlkey=k4ch5nt982857msvue94bsvte&st=jvgh4wi2&raw=1",
+          "https://www.dropbox.com/scl/fi/mddj6hs0or4xbbejruwvm/410056_1.jpg?rlkey=c8ygfvsg6jzod4zf2o8ftlhwr&st=7izxzbmh&raw=1"
+        ]
+      },
+
+      {
+        id: "410806",
+        name: "LAS MINITAS",
+        fotos: ["https://www.dropbox.com/scl/fi/zozw6h0t9lbe9qrujn5oz/410806.jpg?rlkey=b6p221tnazl76ugqw77fa5g8x&st=8snzj6nd&raw=1"]
+      },
+
+      {
+        id: "410805",
+        name: "PAIWITAS",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/a97uvg8x0c0nqy89wqm04/410805_1.jpg?rlkey=1ff1w21gmau9ddo576hj59nb4&st=n1cji0hs&raw=1",
+          "https://www.dropbox.com/scl/fi/adi4wdrjnyu8d9othn81i/410805_2.jpg?rlkey=zboslkt8la91nhakfd2nk6r8t&st=s2bic7b7&raw=1"
+        ]
+      },
+
+      {
+        id: "411519",
+        name: "LOS PLAYONES",
+        fotos: ["https://www.dropbox.com/scl/fi/n7csq5wixzt0bmpuend1q/411519.jpg?rlkey=oc7obvknzaj7ol52blf2na6g3&st=608ctg96&raw=1"]
+      },
+
+      {
+        id: "411552",
+        name: "LAS PILAS VILLA NUEVA",
+        fotos: ["https://www.dropbox.com/scl/fi/85f4h1fo4obgci90ti10c/411552.jpg?rlkey=hevgvo13ai04yb1jzjybms3ig&st=jxksimnw&raw=1"]
+      },
+
+      {
+        id: "411786",
+        name: "OJO DE AGUA",
+        fotos: ["https://www.dropbox.com/scl/fi/g0psbysrn21rfm77vcg7h/411786.jpg?rlkey=d9w2x1cldd9qatdpddlyw4254&st=z8ebz4sw&raw=1"]
+      },
+
+      {
+        id: "411550",
+        name: "CAÑALIPE",
+        fotos: ["https://www.dropbox.com/scl/fi/x49be51jljtxtzvado34f/411550.jpg?rlkey=c7pjhv1yp33x2mnb4yvsrq9o2&st=tyawcxao&raw=1"]
+      },
+
+      {
+        id: "NG-10011-00",
+        name: "NODO CERRO CASITAS",
+        fotos: ["https://www.dropbox.com/scl/fi/zzm37js12usq6n52811fw/NG-10011-00.jpg?rlkey=h0qjy9wca0lpuhj070sguem2o&st=bb43gzl3&raw=1"]
+      },
+
+      {
+        id: "411839",
+        name: "TALOLINGA LEON",
+        fotos: ["https://www.dropbox.com/scl/fi/3z92j99oc720y6j0pvtcp/411839.jpg?rlkey=cnxjan6ujsxidn4reh94ac06t&st=o77ed8hc&raw=1"]
+      },
+
+      {
+        id: "411559",
+        name: "MINA LA INDIA",
+        fotos: ["https://www.dropbox.com/scl/fi/j26quzbh9dc0apz7qsr7a/411559.jpg?rlkey=7yy8y7ee09rijglo54dhmul6b&st=dyq56od8&raw=1"]
+      },
+
+      {
+        id: "411841",
+        name: "EL CACAO-LEON",
+        fotos: ["https://www.dropbox.com/scl/fi/g7jbuqncf6t68ql9bwelc/411841.jpg?rlkey=bo1ypt3quu6azljpx6fudfvbx&st=hdejmxdj&raw=1"]
+      },
+
+      {
+        id: "411370",
+        name: "PUERTO MORAZAN",
+        fotos: ["https://www.dropbox.com/scl/fi/i2qatv7ryx3lvli2vs5tr/411370.jpg?rlkey=h6fz6b1fxwf973x2rlzfn0jle&st=4qot6v15&raw=1"]
+      },
+
+      {
+        id: "411551",
+        name: "LAS MARIAS VILLA NUEVA",
+        fotos: ["https://www.dropbox.com/scl/fi/2tumn1s98lvnzook89iz6/411551.jpg?rlkey=cmbflrjr9cq4cgiasindix4bz&st=q16b78v2&raw=1"]
+      },
+
+      {
+        id: "411373",
+        name: "MINA LIMON 2",
+        fotos: ["https://www.dropbox.com/scl/fi/2wnub7ch871qwinu79ptz/411373.jpg?rlkey=hojyruwzeroedg83t86qydudl&st=zb1ye2a8&raw=1"]
+      },
+
+      {
+        id: "411590",
+        name: "CERRO EL ARADO",
+        fotos: ["https://www.dropbox.com/scl/fi/cm0ef23ky14xnseyw17bn/411590.jpg?rlkey=6kbl870d8q0c4p1l6xkvwh5zt&st=tm4nl7ja&raw=1"]
+      },
+
+      {
+        id: "411211",
+        name: "CERRO LA FLOR",
+        fotos: ["https://www.dropbox.com/scl/fi/7gdf87o48jlbdlzjdf6o0/411211.jpg?rlkey=9djex4iz1dhga0gkerig1imju&st=uqo0nug7&raw=1"]
+      },
+
+      {
+        id: "411589",
+        name: "EL AVISPERO",
+        fotos: ["https://www.dropbox.com/scl/fi/qlaycu9shsd5qjknsig46/411589.jpg?rlkey=xnmn41jsfx1e63x6iux5rgi0w&st=ymj2cadt&raw=1"]
+      },
+
+      {
+        id: "411587",
+        name: "EL AYOTE 1",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/w8jrlj8de1prlnto2atg6/411557_2.jpg?rlkey=nb5fmjdh6at9265zl0ext7fes&st=jjx165v5&raw=1",
+          "https://www.dropbox.com/scl/fi/zm4tuiw348cyv8eseyjyo/411557_1.jpg?rlkey=fzk0w0ophxdiedzx337mswz0d&st=0te3761h&raw=1"
+        ]
+      },
+
+      {
+        id: "411581",
+        name: "EL CASTILLO CERRO LA TUCA",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/5067thw7ww7hyvvv2fliz/411581_2.jpg?rlkey=j3zr0lejsz556upt34yaq4811&st=oc89noel&raw=1",
+          "https://www.dropbox.com/scl/fi/pi0o11g97lezm7b18b9rd/411581_1.jpg?rlkey=vxpfanclnzivfi1jg36xt372m&st=rm8kgniq&raw=1"
+        ]
+      },
+
+      {
+        id: "410250",
+        name: "El CASTILLO RIO SAN JUAN",
+        fotos: ["https://www.dropbox.com/scl/fi/cotn65nria7wws6qpm8f3/410250.jpg?rlkey=4zhcpyr7yl20l89eml0qvemgu&st=jjc3su6o&raw=1"]
+      },
+
+      {
+        id: "411387",
+        name: "EL JOBO",
+        fotos: ["https://www.dropbox.com/scl/fi/xyh21on5hs5p11czb093u/411387.jpg?rlkey=1zdhaf6wr57m6srtnar2lkp5n&st=d12p3xtc&raw=1"]
+      },
+
+      {
+        id: "411572",
+        name: "REPETIDOR POLO DESARROLLO",
+        fotos: ["https://www.dropbox.com/scl/fi/cegbpdxzpkf9hy35lyoni/411572.jpg?rlkey=sfivfsq2aqdabz32obfbf0ynw&st=l4knes46&raw=1"]
+      },
+
+      {
+        id: "NG-20001-490-00",
+        name: "REPETIDOR FRUTA DE PAN",
+        fotos: ["https://www.dropbox.com/scl/fi/tiqj3f8e2r93v9an6e3g1/NG-20001-490-00.jpg?rlkey=a4q1c6ramms7n9g0omlshv2u0&st=bl3ukbu7&raw=1"]
+      },
+
+      {
+        id: "411609",
+        name: "EL PAVON",
+        fotos: ["https://www.dropbox.com/scl/fi/4fupcd56lb7wcniclbuyk/411609.jpg?rlkey=wm47a6q22ydkjn7yqj0u778p5&st=ypl5tpqt&raw=1"]
+      },
+
+      {
+        id: "411571",
+        name: "POLO DE DESARROLLO",
+        fotos: ["https://www.dropbox.com/scl/fi/wbdy8pth4uomvvqhgezsi/411571.jpg?rlkey=y1pr4rc7tfeghqtz6dft97ug3&st=7ne7e27w&dl=0"]
+      },
+
+      {
+        id: "411614",
+        name: "TASBAPAUNI",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/gvi2fnwew66zy0st8br6s/411614_1.jpg?rlkey=ryontuwn2l8kwbftw2g286fzf&st=r35f944y&raw=1",
+          "https://www.dropbox.com/scl/fi/5xgqwn0f0vumnjm6ig8l5/411614_2.jpg?rlkey=amdqjka0rxmhvm8bsvp3iyjtd&st=39mbrekj&raw=1"
+        ]
+      },
+
+      {
+        id: "411401",
+        name: "EL PARAISO",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/w31iex1biybvlit4l8x4l/411401_1.jpg?rlkey=vln3tnlf3w8yj4ni81pvkxi5s&st=60rdx5ab&raw=1",
+          "https://www.dropbox.com/scl/fi/6txan7z0ipc1oa39hc4cj/411401_2.jpg?rlkey=bv0cckxslllgg24fwboo99dji&st=4agm7g9d&raw=1"
+        ]
+      },
+
+      {
+        id: "NG-20001-580",
+        name: "KAKA CREEKS",
+        fotos: ["https://www.dropbox.com/scl/fi/6qpk0iyqxtcfsazue4odu/NG-20001-580.jpg?rlkey=yv7uyjzgawqng5ukbkhbbm25e&st=ipyl7l40&raw=1"]
+      },
+
+      {
+        id: "411289",
+        name: "KARAWALA",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/7syhk002kylrcofnpikfo/411289_1.jpg?rlkey=8tpt45hq85apiuhelsfu8ezi1&st=v9g4fo3h&raw=1",
+          "https://www.dropbox.com/scl/fi/xrk1vlaftqg6kz1kohknr/411289.jpg?rlkey=zsl7dmooj4yzsn0hex394xzxp&st=0uqr3rju&raw=1"
+        ]
+      },
+
+      {
+        id: "411391",
+        name: "KITULIA",
+        fotos: ["https://www.dropbox.com/scl/fi/8r7doz95wgjayqzigv4f5/411391.jpg?rlkey=1vbyg31zoqjirv9zxn50sf2zc&st=mknpl9n9&raw=1"]
+      },
+
+      {
+        id: "411621",
+        name: "KM 20 AL CASTILLO",
+        fotos: ["https://www.dropbox.com/scl/fi/eff2vdsu71nvqz0meb6ql/411621.jpg?rlkey=hqx20z8x2q26wq6rikkay32r6&st=63twynvu&raw=1"]
+      },
+
+      {
+        id: "410525",
+        name: "LA CORONA",
+        fotos: ["https://www.dropbox.com/scl/fi/gh4mvvkzpj7bohq5loew5/410525.jpg?rlkey=r1tm3jttohy52gvnercyvupv9&st=vys6fucp&raw=1"]
+      },
+
+      {
+        id: "410060",
+        name: "LA GATEADA",
+        fotos: ["https://www.dropbox.com/scl/fi/n6w9c8zxx1mj3wz6r0wkv/410060.jpg?rlkey=ourslum7gctskvxozhvwf88rv&st=pr0pdrle&raw=1"]
+      },
+
+      {
+        id: "411399",
+        name: "LA MONA",
+        fotos: ["https://www.dropbox.com/scl/fi/lc8s9mnxqbnw520bt5s9v/411399.jpg?rlkey=cmcg6tgjqutr21mos865rojee&st=gjsoc2p7&raw=1"]
+      },
+
+      {
+        id: "411553",
+        name: "LOS CHINAMOS",
+        fotos: ["https://www.dropbox.com/scl/fi/rtxppvoqytj3waaphoay6/411553.jpg?rlkey=5n8sunah9d6z8wmn6fd9xr8je&st=8roo7o5s&raw=1"]
+      },
+
+      {
+        id: "410769",
+        name: "MATAYAHUAL",
+        fotos: ["https://www.dropbox.com/scl/fi/umy5d6la6tufdpyyulxyg/410769.jpg?rlkey=0ucq7bdsnj0jk5zaxe6lrrvkl&st=mobjzoex&raw=1"]
+      },
+
+      {
+        id: "NG-20001-482",
+        name: "NODO VERACRUZ",
+        fotos: ["https://www.dropbox.com/scl/fi/v7of95zyjn2nbaeoprm3a/NG-20001-482.jpg?rlkey=o1ev0r9bt8baelf6g2no929qr&st=wjwdvjso&raw=1"]
+      },
+
+      {
+        id: "411398",
+        name: "SAN MIGUEL",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/l9llvs0cionkp2esy61qe/411398_1.jpg?rlkey=kpju9gxqutafj3s24cgnafwg6&st=6cjqn2k7&raw=1",
+          "https://www.dropbox.com/scl/fi/7hd3909e214pjxf59ahek/411398_2.jpg?rlkey=gp7uabgwp7wm36nkukgocn1dr&st=is1cdy2n&raw=1"
+        ]
+      },
+
+      {
+        id: "410335",
+        name: "EMPALME SAN FRANCISCO",
+        fotos: ["https://www.dropbox.com/scl/fi/6mcglxcdac97sjjys97f8/410335.jpg?rlkey=axu9vk5cmhzevm53n42xk4xil&st=14og5t2e&raw=1"]
+      },
+
+      {
+        id: "411584",
+        name: "ARRAYAN AMERRISQUE",
+        fotos: ["https://www.dropbox.com/scl/fi/htgch79cjsvi2qpm0wi9i/411584.jpg?rlkey=im5c9cjtigi0y8dhp22w8gzgw&st=7br6i6rh&raw=1"]
+      },
+
+      {
+        id: "410758",
+        name: "HATO GRANDE",
+        fotos: ["https://www.dropbox.com/scl/fi/a002i1kggezhwk6tqup2e/410758.jpg?rlkey=gkzig456ffmx65xgvvjxbvctw&st=nih009cg&raw=1"]
+      },
+
+      {
+        id: "411615",
+        name: "ORINOCO",
+        fotos: ["https://www.dropbox.com/scl/fi/aga4u80xq4bb4r8me7gf2/411615.jpg?rlkey=2su7545rik3n9a3knqao1djg3&st=scgel33o&raw=1"]
+      },
+
+      {
+        id: "NG-20001-645",
+        name: "REPETIDOR NUEVA QUEZADA",
+        fotos: ["https://www.dropbox.com/scl/fi/axttdvk1mivydssva5nn7/NG-20001-645.jpg?rlkey=2sqliahalag3kumtah1wv2t7s&st=1jcl1g3i&raw=1"]
+      },
+
+      {
+        id: "411624",
+        name: "REPETIDOR SAN RAMON",
+        fotos: ["https://www.dropbox.com/scl/fi/7kai83lh81w13ulus4lwb/411624_1.jpg?rlkey=x4k4pilf3x9yyfq7bsp2j6gah&st=923vsdkk&raw=1",
+                "https://www.dropbox.com/scl/fi/whp64j9t5sifd5sgoxaf0/411624_2.jpg?rlkey=xloh4wllttrxn0lvanrab2bcb&st=njsm8isy&raw=1"
+        ]
+      },
+
+      {
+        id: "411573",
+        name: "SAN ISIDRO NUEVA GUINEA",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/5cu2r5zxg57zd6bz7s7ps/411573_1.jpg?rlkey=5jbyg9meo47b01jsxngnc7nxh&st=yp1n91kq&raw=1",
+          "https://www.dropbox.com/scl/fi/so2rppigh55z7fb00dzm8/411573_2.jpg?rlkey=9ou09bxi5idngfk03vrugi3rg&st=w0s982u9&raw=1",
+          "https://www.dropbox.com/scl/fi/zwkc605rr6rvx3ka8oues/411573_3.jpg?rlkey=5n3vr1rh250io3wwmwlr0c8or&st=qk0ehk0e&raw=1"         
+        ]
+      },
+
+      {
+        id: "410248",
+        name: "BOCA DE SABALOS",
+        fotos: ["https://www.dropbox.com/scl/fi/akvo908rfchd7vhanwaa2/410248.jpg?rlkey=2kfaz7hao3cs3yqskc26k9eu2&st=69ai4jq4&raw=1"]
+      },
+
+      {
+        id: "411380",
+        name: "SAN ANTONIO KUKARAWALA",
+        fotos: ["https://www.dropbox.com/scl/fi/w6jp7pkfute10lqna93xk/411380.jpg?rlkey=oenii4ah0dxpcwfmapywq3dcm&st=xdgfq299&raw=1"]
+      },
+
+      {
+        id: "410435",
+        name: "BUENA VISTA",
+        fotos: ["https://www.dropbox.com/scl/fi/pqw5s7rwhlhtrb1ai19xy/410435.jpg?rlkey=xvvhhx7fjmtz8hwnx96pp63b7&st=gu2f66gp&raw=1"]
+      },
+
+      {
+        id: "411186",
+        name: "NUEVA QUEZADA",
+        fotos: ["https://www.dropbox.com/scl/fi/q5x29o3q6pdyf5s4wfoan/411186.jpg?rlkey=43pfgy0k645390ryqm8bpcx8r&st=r8qlby8z&raw=1"]
+      },
+
+      {
+        id: "411575",
+        name: "LAS CAÑITAS",
+        fotos: ["https://www.dropbox.com/scl/fi/dw3u917ux8c7nsdjqzq97/411575.jpg?rlkey=uof1jswu39etrfjntz6fcz50g&st=yfh6bl66&raw=1"]
+      },
+
+      {
+        id: "411783",
+        name: "WASPADO",
+        fotos: ["https://www.dropbox.com/scl/fi/bbu81mwno2hoouvnrx0n3/411783.jpg?rlkey=ecgsjyqg02mp8ooqgizuhug1y&st=nypmx3ik&raw=1"]
+      },
+
+      {
+        id: "411583",
+        name: "LAS PAVAS",
+        fotos: ["https://www.dropbox.com/scl/fi/wkalx6kl2bkc850g88fnq/411583.jpg?rlkey=98g10174visom2utegbl29nyg&st=hfspz3dw&raw=1"]
+      },
+
+      {
+        id: "412154",
+        name: "LOS CHILES 2",
+        fotos: ["https://www.dropbox.com/scl/fi/fog4cwepj7zlzh0qyqyxw/412154.jpg?rlkey=gefjxm32gfrth3g1sn7gq5smm&st=wi0jzad7&raw=1"]
+      },
+
+      {
+        id: "411584",
+        name: "CARQUITA",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/1q822b0z7s1sy7wkqno48/411584_1.jpg?rlkey=155lfrabt82i4p69ibn00dtbe&st=ihwqn9kt&raw=1",
+          "https://www.dropbox.com/scl/fi/8gjax5it1bqfg4375rflo/411584_2.jpg?rlkey=8baob49saytzqy46haxc9gpp5&st=34w80h2p&raw=1",
+          "https://www.dropbox.com/scl/fi/wyovlz5fq02jkj29tbsda/411584_3.jpg?rlkey=ewwetsvrrg2lnzr17d0jsvjw6&st=f4jx671g&raw=1"         
+        ]
+      },
+
+      {
+        id: "411389",
+        name: "LA ORQUETA",
+        fotos: ["https://www.dropbox.com/scl/fi/3uc2ksslv4wjy27b8xc3u/411389.jpg?rlkey=sf0l4szin3ulrms5jvwn1xc8e&st=11i0jlol&raw=1"]
+      },
+
+      {
+        id: "411554",
+        name: "CERRO CHATO",
+        fotos: ["https://www.dropbox.com/scl/fi/b7gy0qqsucl26xko3fzhc/411554.jpg?rlkey=enusukyoibq7yp9f27p3mymp0&st=4cqcq75b&raw=1"]
+      },
+
+      {
+        id: "411632",
+        name: "LA ESTACA CERRO EL TORO",
+        fotos: ["https://www.dropbox.com/scl/fi/eclcobiwpxpqps9p3t0q7/411632.jpg?rlkey=5lfozttzqm4vnx2g1qhkl0lhy&st=82yosbe4&raw=1"]
+      },
+
+      {
+        id: "411587",
+        name: "JICARITO",
+        fotos: ["https://www.dropbox.com/scl/fi/no0og4a9a96mllypbyi5u/411587.jpg?rlkey=2mu3feeugqn2v3kmbqzv9r1oj&st=06nyo49m&raw=1"]
+      },
+
+      {
+        id: "411578",
+        name: "LA CALAMIDAD",
+        fotos: [
+          "https://www.dropbox.com/scl/fi/nn5rjsmpo9ax38bpi1ybx/411578_1.jpg?rlkey=5g2vw1jocs8n9isf1uwpmm6vz&st=b5ek2sqs&raw=1",
+          "https://www.dropbox.com/scl/fi/0v2htk8ukwhvs8ygcv6xu/411578_2.jpg?rlkey=5vkz2sz687nl43w08px46q1ru&st=tflc3nds&raw=1"
+        ]
+      },
+
+      {
+        id: "NG-20001-437",
+        name: "REPETIDOR MONKEY POINT",
+        fotos: ["https://www.dropbox.com/scl/fi/qw73kng6ll5c20tq2ic8h/NG-20001-437.jpg?rlkey=w68oyxyn5ft2foca0jyy09vfv&st=4eisi5xo&raw=1"]
+      },
+
+      {
+        id: "411171",
+        name: "SAN JUAN DE NICARAGUA",
+        fotos: ["https://www.dropbox.com/scl/fi/o23v5c0y0betlz49yt0d2/411171.jpg?rlkey=0cmzt7kck6vw72llk3w4k8avz&st=pb9xuglo&raw=1"]
+      },
+
+      {
+        id: "411601",
+        name: "SAN JOSE DE LA VEGA",
+        fotos: ["https://www.dropbox.com/scl/fi/585c58e9p447illfqxf9q/411601.jpg?rlkey=q1txpp30pabo1dbsw7vyedlbp&st=q9qzjj2x&raw=1"]
+      },
+
+      {
+        id: "411385",
+        name: "LAS CAÑAS",
+        fotos: ["https://www.dropbox.com/scl/fi/6165dqebuyhfnr0cjj6nj/411385.jpg?rlkey=j8a9vwrtts8esma7blg575cvu&st=qqb5chmt&raw=1"]
+      },
+
+      {
+        id: "410847",
+        name: "EL BLUFF",
+        fotos: ["https://www.dropbox.com/scl/fi/0bicdpnhkbn7bzss927tz/410847.jpg?rlkey=30igizuob2aq36t5hxi9xpbym&st=rkwkgbro&raw=1"]
+      },
+
+      {
+        id: "411770",
+        name: "LA GALLINA",
+        fotos: ["https://www.dropbox.com/scl/fi/0lzl4d93marw7aubqkeui/411770.jpg?rlkey=un01aw4ox0f4ab3uz8odok8gt&st=eee4u6b9&raw=1"]
+      },
+
+      {
+        id: "411122",
+        name: "LA FONSECA NUEVA GUINEA",
+        fotos: ["https://www.dropbox.com/scl/fi/mvphka8vxttxtzf0n5qnj/411122.jpg?rlkey=xo5a1i17qrpouz944pvmrp27g&st=26um2emw&raw=1"]
+      },
+
+      {
+        id: "410769",
+        name: "EL SERRANO",
+        fotos: ["https://www.dropbox.com/scl/fi/pdw68zs9kwlo8zoqis7xg/411769.jpg?rlkey=cesl0nlphy8qbf2zuo29gi1a4&st=fkm8lham&raw=1"]
+      },
+
+      {
+        id: "411619",
+        name: "MEXICO CRUZ VERDE",
+        fotos: ["https://www.dropbox.com/scl/fi/brd2bhogkc41xnmc8tqly/411619.jpg?rlkey=ut07lqx4p9pwxxglpignb9oh4&st=phgy4h5u&raw=1"]
+      },
+
+      {
+        id: "410766",
+        name: "SAN BUENA VENTURA",
+        fotos: ["https://www.dropbox.com/scl/fi/z9xhn0lqib905ygdwo8wv/410766.jpg?rlkey=zp7dwxvkhv0xzx6dfrzzh9pvm&st=f8c59t9p&raw=1"]
+      },
+
+      {
+        id: "410851",
+        name: "CARA DE MONO",
+        fotos: ["https://www.dropbox.com/scl/fi/lr63rpgx546mi1v1hj2bz/410851.jpg?rlkey=zbl05vlncwk6na1o18ezqyozs&st=56pnaids&raw=1"]
+      },
+
+      {
+        id: "411813",
+        name: "MELCHORITA",
+        fotos: ["https://www.dropbox.com/scl/fi/p0mwwu2t9jsximi87c64s/411813.jpg?rlkey=kydhs8y3fy18gf6kvgzs6wxs3&st=53shhv53&raw=1"]
+      },
+
+      {
+        id: "410097",
+        name: "CORN ISLAND",
+        fotos: ["https://www.dropbox.com/scl/fi/wfy0mfp5tej5t0nfrtsdm/410097.jpg?rlkey=h6h1ev0q32lh0it92i21a2w8k&st=m5oihns3&raw=1"]
+      },
+
+      {
+        id: "411339",
+        name: "CORN ISLAND 2",
+        fotos: ["https://www.dropbox.com/scl/fi/wfy0mfp5tej5t0nfrtsdm/410097.jpg?rlkey=h6h1ev0q32lh0it92i21a2w8k&st=m5oihns3&raw=1"]
+      },
+
+      {
+        id: "411760",
+        name: "SAN GERONIMO",
+        fotos: ["https://www.dropbox.com/scl/fi/yttjtbgbvgxpfbwbzi5pp/411760.jpg?rlkey=3tvqdko3qnekw6m1rvh0hz76b&st=sorrs067&raw=1"]
+      },
+
+      {
+        id: "411765",
+        name: "SAN ONOFRE",
+        fotos: ["https://www.dropbox.com/scl/fi/jit8sr538qlb81esbo73a/411765.jpg?rlkey=mhoiozom2dfo0lxf2aa1ncxma&st=790540oj&raw=1"]
+      },
+
+      {
+        id: "412122",
+        name: "EL RAMA 3",
+        fotos: ["https://www.dropbox.com/scl/fi/vtdub78ws8lgy7scyzz9n/412122.jpg?rlkey=kulbolvuwkc3vo8owac8mo6si&st=y2u800v2&raw=1"]
+      },
+
+      {
+        id: "410070",
+        name: "MATEARE",
+        fotos: ["https://www.dropbox.com/scl/fi/gbikvkyq7ao4ughgmn1mq/410070.jpg?rlkey=qcax7lfukcq200d6np7dw77h8&st=4acx4s23&raw=1"]
+      },
+
+      {
+        id: "410569",
+        name: "CUESTA EL COYOL",
+        fotos: ["https://www.dropbox.com/scl/fi/wjfqop2ey9p8r0q2wltjq/410569.jpg?rlkey=fqbefsdctdjcbxwl8iv6yef2a&st=qx4k156d&raw=1"]
+      },
+
+      {
+        id: "411103",
+        name: "LA TORTUGA",
+        fotos: ["https://www.dropbox.com/scl/fi/xdab6zqjao96hq59j0jrs/411103.jpg?rlkey=jbyz69hhoxchbrpeg27mkqn0n&st=xvgxxk03&raw=1"]
+      },
+
+      {
+        id: "410727",
+        name: "OSTIONAL",
+        fotos: ["https://www.dropbox.com/scl/fi/jh2loxg3bq7zsuadfhhmp/410727.jpg?rlkey=py8lxfqrna2ianv9qih44lu06&st=e60ezval&raw=1"]
+      },
+
+      {
+        id: "410010",
+        name: "RIVAS (CERRO EL ROSARIO)",
+        fotos: ["https://www.dropbox.com/scl/fi/qxa1sfhnxomidx7ndx4xq/410010.jpg?rlkey=slwwghm7xy6sm9c4w5ixvr3vj&st=7wdtd5ji&raw=1"]
+      },
+
+      {
+        id: "410014",
+        name: "CATARINA",
+        fotos: ["https://www.dropbox.com/scl/fi/bd0fs9h8dnrnpproflnjy/410014.jpg?rlkey=ken68xrx1yebyq8voeiyw4r67&st=iukcbnpl&raw=1"]
+      },
+
+      {
+        id: "410597",
+        name: "POCHOCUAPE",
+        fotos: ["https://www.dropbox.com/scl/fi/0rtnioxwy6i97wkvno8ma/410597.jpg?rlkey=ghj8qyy1k7gqb8noie3y9av5g&st=i4h7f8qp&raw=1"]
+      },
+
+      {
+        id: "410177",
+        name: "EL CHILAMATE",
+        fotos: ["https://www.dropbox.com/scl/fi/y4yo3r2ocaozqeczsne61/410177.jpg?rlkey=7x1ljnlssmwr3zqe4vv7rmapd&st=q8gyivsg&raw=1"]
+      },
+
+      {
+        id: "411250",
+        name: "MERCADO ORIENTAL 1",
+        fotos: ["https://www.dropbox.com/scl/fi/up0abbk3xr2pwyph24dhi/411250.jpg?rlkey=xh0my4zxfslpkbtd65hwmrmat&st=addwwogn&raw=1"]
+      },
+
+      {
+        id: "410099",
+        name: "MOYOGALPA",
+        fotos: ["https://www.dropbox.com/scl/fi/yrd04ch8wn8adei9wmqxq/410099.jpg?rlkey=jesj9aaqgnbba5lplf7kp3re1&st=p7txuh8j&raw=1"]
+      },
+
+      {
+        id: "410108",
+        name: "ALTAGRACIA (ISLA DE OMETEPE)",
+        fotos: ["https://www.dropbox.com/scl/fi/46oxqj04ey9itmzixpdjy/ISLA_OMETEPE.jpg?rlkey=ya0jgpump4eylbno9jarjwdqz&st=r8sdgv5a&raw=1"]
+      },
+
+      {
+        id: "410360",
+        name: "PLAYA SANTO DOMINGO - ISLA OMETEPE",
+        fotos: ["https://www.dropbox.com/scl/fi/46oxqj04ey9itmzixpdjy/ISLA_OMETEPE.jpg?rlkey=ya0jgpump4eylbno9jarjwdqz&st=r8sdgv5a&raw=1"]
+      },
+
+      {
+        id: "410564",
+        name: "LA FLOR - ISLA DE OMETEPE",
+        fotos: ["https://www.dropbox.com/scl/fi/46oxqj04ey9itmzixpdjy/ISLA_OMETEPE.jpg?rlkey=ya0jgpump4eylbno9jarjwdqz&st=r8sdgv5a&raw=1"]
+      },
+
+      {
+        id: "410566",
+        name: "BALGUE - ISLA OMETEPE",
+        fotos: ["https://www.dropbox.com/scl/fi/46oxqj04ey9itmzixpdjy/ISLA_OMETEPE.jpg?rlkey=ya0jgpump4eylbno9jarjwdqz&st=r8sdgv5a&raw=1"]
+      },
+
+      {
+        id: "410888",
+        name: "PLAYA SAN RAMON - ISLA OMETEPE",
+        fotos: ["https://www.dropbox.com/scl/fi/46oxqj04ey9itmzixpdjy/ISLA_OMETEPE.jpg?rlkey=ya0jgpump4eylbno9jarjwdqz&st=r8sdgv5a&raw=1"]
+      },
+
+      {
+        id: "413062",
+        name: "MICROCELL HOTEL REITH GRANADA",
+        fotos: ["https://www.dropbox.com/scl/fi/5c6xmbh0gq9ll4uf6f6nb/413062.jpg?rlkey=nanbds5820jtbsy521ohfmmvi&st=rpoc2f3z&raw=1",
+                "https://www.dropbox.com/scl/fi/xfv9qhdvw4gclkbzc4c93/413062_1.jpg?rlkey=iooa3t4ekmdjd3dki7okpt53m&st=xxild4d6&raw=1"
+        ]
+      },
+
+      {
+        id: "412144",
+        name: "POSTE MERCADO ORIENTAL 3",
+        fotos: ["https://www.dropbox.com/scl/fi/9nuu9ckd6x794jwo7jbsc/412144.jpg?rlkey=nsma3x12p2whwh1ohp7wphpbb&st=9sp8yh5y&raw=1"]
+      },
+
+      {
+        id: "411046",
+        name: "EMBAJADA DE ESPAÑA",
+        fotos: ["https://www.dropbox.com/scl/fi/3xtvbbqn0hie84kg16hon/411046.jpg?rlkey=2egcdwnaz65kr6wgfw3spr7x5&st=6enjrlox&raw=1"]
+      },
+
+      {
+        id: "411435",
+        name: "KM 58 CARR. VIEJA A LEON",
+        fotos: ["https://www.dropbox.com/scl/fi/od1idg76fyz7z8ivve3q5/411435.jpg?rlkey=af6qtxyslo0wtv9neb5584vcp&st=x4l8ylae&raw=1"]
+      },
+
+      {
+        id: "412155",
+        name: "EL BRAMADERO",
+        fotos: ["https://www.dropbox.com/scl/fi/5g8ylb36p1jh0xmjhukk7/412155.jpg?rlkey=howlykczjpcdtpayqfv3rfnu4&st=lf6j8jdt&raw=1"]
+      },
+
+      {
+        id: "411111",
+        name: "LA RICA",
+        fotos: ["https://www.dropbox.com/scl/fi/epifs4eeccv7lu35t5sdu/411111.jpg?rlkey=vgulsfzipqjrhey1rqeyik8xp&st=kqun4i4w&raw=1"]
+      },
+
+      {
+        id: "411517",
+        name: "REPETIDOR PAIWAS",
+        fotos: ["https://www.dropbox.com/scl/fi/80y6yws0h37nel06jzue9/411517.jpg?rlkey=qy011ew5c95u1twprki7d58d3&st=sxhd613s&raw=1"]
+      },
+
+      {
+        id: "411549",
+        name: "EL COROZO MATIGUAS",
+        fotos: ["https://www.dropbox.com/scl/fi/9ngighvarhpggr0ghgz8h/411549.jpg?rlkey=f8xit3q92h1skkf7rsca8k6rz&st=40hobska&raw=1"]
+      },
+
+      {
+        id: "411627",
+        name: "EL COROZO SANTA RITA",
+        fotos: ["https://www.dropbox.com/scl/fi/up3jksdi97sxa423mbo9m/411627.jpg?rlkey=r8lbhoc1wz036h7czkhdr2zuk&st=2z6dynjs&raw=1"]
+      },
+
+      {
+        id: "411594",
+        name: "PUEBLO NUEVO JINOTEGA",
+        fotos: ["https://www.dropbox.com/scl/fi/2yzqzb47q44ha4p7qrhgy/411594.jpg?rlkey=qo9olwqudf53oy869e94575p7&st=8ummml1j&raw=1"]
+      },
+
+      {
+        id: "411602",
+        name: "EL DORADO",
+        fotos: ["https://www.dropbox.com/scl/fi/zg53589syqmx06mectq7c/411602.jpg?rlkey=cx9pfj7frv391z4i3kyudg7pz&st=uz0zhqzm&raw=1"]
+      },
+
+      {
+        id: "411741",
+        name: "SAN ANTONIO JINOTEGA",
+        fotos: ["https://www.dropbox.com/scl/fi/fd45y5s1filvzywpxhr63/411741.jpg?rlkey=unenwa5wt5rnwzyf4knr215g4&st=80t8bymk&raw=1"]
+      },
+
+      {
+        id: "412210",
+        name: "CERRO PILON",
+        fotos: ["https://www.dropbox.com/scl/fi/jho4mqssi9s0gy8ua27vy/412210.jpg?rlkey=trm3d1jygphsj8sqqv2ej99do&st=9s73ug00&raw=1"]
+      },
+
+      {
+        id: "412194",
+        name: "EL PARAISO 2",
+        fotos: ["https://www.dropbox.com/scl/fi/v5muumm9lu34mt0s0z523/412194.jpg?rlkey=x73t360gmlrxovsi9cdaggo7q&st=m2y88prw&raw=1"]
+      },
+
+
+{
+  id: "410409",
+  name: "LAS COLINAS 2",
+  fotos: ["https://www.dropbox.com/scl/fi/2w6qt4sh9clzv5fejj7wi/410409.jpg?rlkey=etuv9p4c8s6r6dapa70h0ovk6&st=p01rab99&raw=1"]
+},
+{
+  id: "410587",
+  name: "LAS MAJADAS",
+  fotos: ["https://www.dropbox.com/scl/fi/tu-link-aqui.jpg?raw=1"]
+},
+{
+  id: "410687",
+  name: "COW ASTRO NICARAGUA",
+  fotos: ["https://www.dropbox.com/scl/fi/120hbrxyj4agwlibftyxw/410687.jpg?rlkey=4ldvmuymly04t9wpkgad4hnaj&st=ly1c1bqb&raw=1"]
+},
+{
+  id: "411906",
+  name: "POLIDEPORTIVO ALEXIS ARGUELLO",
+  fotos: ["https://www.dropbox.com/scl/fi/gccqc0j3204omjacqu66f/410496.jpg?rlkey=ai82rakjaaaouu61zfkrubzak&st=s63bhc3x&raw=1"]
+},
+{
+  id: "412146",
+  name: "COW ISA EL POLVON",
+  fotos: ["https://www.dropbox.com/scl/fi/qqdq6k6buubj2wzxpz91h/412146.jpg?rlkey=0dr2hwbeyasdv1sfgq135ezdr&st=l58210rn&raw=1"]
+},
+{
+  id: "413073",
+  name: "MICRO AGRENIC MASAYA",
+  fotos: ["https://www.dropbox.com/scl/fi/qtfsi5tp9tk4gdlt0221r/413073.jpg?rlkey=9r1z2cq8ir6cp8bbw5ep8opn7&st=z6gmnmnk&raw=1"]
+}
+
+
+
+      // Agrega aquí más sitios según necesites
+    ];
+
+    // Elementos DOM
+    const searchInput = document.getElementById("search-input");
+    const searchBtn = document.getElementById("search-btn");
+    const backdrop = document.getElementById("modal-backdrop");
+    const modalImg = document.getElementById("modal-img");
+    const modalTitle = document.getElementById("modal-title");
+    const modalCaption = document.getElementById("modal-caption");
+    const closeModalBtn = document.getElementById("close-modal");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+
+    const siteModal = document.getElementById("site-modal");
+    const siteListEl = document.getElementById("site-list");
+    const openSitesBtn = document.getElementById("open-sites-btn");
+    const closeSiteModalBtn = document.getElementById("close-site-modal");
+    const downloadCsvBtn = document.getElementById("download-csv-btn");
+
+    let currentSet = null;
+    let currentIndex = 0;
+
+    function normalize(str) {
+      return (str || "").toString().toLowerCase().trim();
+    }
+
+    // Buscar por ID o nombre y abrir modal imagen
+    function doSearch(term) {
+      const t = normalize(term);
+      if (!t) return;
+      const result = imagenesData.find(it =>
+        normalize(it.id).includes(t) || normalize(it.name).includes(t)
+      );
+      if (result) {
+        openModal(result, 0);
+      } else {
+        alert(`No se encontraron resultados para "${term}"`);
+      }
+    }
+
+    searchBtn.addEventListener("click", () => doSearch(searchInput.value));
+    searchInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") doSearch(searchInput.value);
+    });
+
+    // Abrir modal imagen
+    function openModal(set, index) {
+      currentSet = set;
+      currentIndex = index;
+      updateModal();
+      backdrop.classList.add("active");
+      backdrop.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    // Actualizar contenido modal imagen
+    function updateModal() {
+      if (!currentSet) return;
+      const url = currentSet.fotos[currentIndex];
+      modalImg.src = url;
+      modalTitle.textContent = currentSet.name + " • " + currentSet.id;
+      modalCaption.textContent = `Imagen ${currentIndex + 1} de ${currentSet.fotos.length}`;
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === currentSet.fotos.length - 1;
+    }
+
+    // Cerrar modal imagen
+    function closeModal() {
+      backdrop.classList.remove("active");
+      backdrop.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      currentSet = null;
+      currentIndex = 0;
+      modalImg.src = "";
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateModal();
+      }
+    });
+    nextBtn.addEventListener("click", () => {
+      if (currentSet && currentIndex < currentSet.fotos.length - 1) {
+        currentIndex++;
+        updateModal();
+      }
+    });
+    closeModalBtn.addEventListener("click", closeModal);
+    backdrop.addEventListener("click", e => {
+      if (e.target === backdrop) closeModal();
+    });
+
+    // Modal lista de sitios
+    function openSiteModal() {
+      buildSiteList();
+      siteModal.classList.add("active");
+      siteModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeSiteModal() {
+      siteModal.classList.remove("active");
+      siteModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    function buildSiteList() {
+      siteListEl.innerHTML = "";
+      imagenesData.forEach(it => {
+        const div = document.createElement("div");
+        div.className = "site-item";
+        div.textContent = `${it.id} — ${it.name}`;
+        div.addEventListener("click", () => {
+          closeSiteModal();
+          openModal(it, 0);
+        });
+        siteListEl.appendChild(div);
+      });
+    }
+
+    openSitesBtn.addEventListener("click", openSiteModal);
+    closeSiteModalBtn.addEventListener("click", closeSiteModal);
+
+    // Cerrar modales con tecla ESC
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        if (siteModal.classList.contains("active")) closeSiteModal();
+        if (backdrop.classList.contains("active")) closeModal();
+      }
+    });
+
+    // Descargar lista .csv con fecha y hora
+    downloadCsvBtn.addEventListener("click", () => {
+      if (!imagenesData.length) return alert("No hay datos para descargar.");
+
+      // Construir CSV
+      let csvContent = "ID,Nombre del Sitio\n";
+      imagenesData.forEach(it => {
+        // Escapar comas o comillas si hubiera, usando ""
+        const safeName = `"${it.name.replace(/"/g, '""')}"`;
+        csvContent += `${it.id},${safeName}\n`;
+      });
+
+      // Crear nombre con fecha y hora
+      const now = new Date();
+      const pad = n => n.toString().padStart(2, "0");
+      const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+      const timeStr = `${pad(now.getHours())}-${pad(now.getMinutes())}`;
+      const filename = `sitios_${dateStr}_${timeStr}.csv`;
+
+      // Crear enlace de descarga
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+const privateSites = [
+    { id: "410409", name: "LAS COLINAS 2" },
+    { id: "410587", name: "LAS MAJADAS" },
+    { id: "410687", name: "COW ASTRO NICARAGUA" },
+    { id: "411906", name: "POLIDEPORTIVO ALEXIS ARGUELLO" },
+    { id: "412146", name: "COW ISA EL POLVON" },
+    { id: "413073", name: "MICRO AGRENIC MASAYA" }
+  ];
+
+  const privateModal = document.getElementById("private-modal");
+  const openPrivateBtn = document.getElementById("open-private-btn");
+  const closePrivateModal = document.getElementById("close-private-modal");
+  const privateSiteList = document.getElementById("private-site-list");
+
+
+  
+ openPrivateBtn.addEventListener("click", () => {
+  privateSiteList.innerHTML = "";
+
+  privateSites.forEach(site => {
+    const data = imagenesData.find(img => img.id === site.id);
+    const item = document.createElement("div");
+    item.className = "site-item";
+
+    if (data && data.fotos.length > 0) {
+      const link = document.createElement("a");
+      link.href = data.fotos[0]; // primera foto
+      link.textContent = `${site.id} - ${site.name}`;
+      link.addEventListener("click", (e) => {
+        e.preventDefault(); // evitar navegación
+        openImageModal(data);
+      });
+      item.appendChild(link);
+    } else {
+      item.textContent = `${site.id} - ${site.name}`;
+    }
+
+    privateSiteList.appendChild(item);
+  });
+
+  privateModal.classList.add("active");
+});
+
+function openImageModal(data) {
+  let index = 0;
+
+  // 🔒 Cerrar el modal de la lista privada
+  document.getElementById("private-modal").classList.remove("active");
+
+  const modalBackdrop = document.getElementById("modal-backdrop");
+  const modalImg = document.getElementById("modal-img");
+  const modalTitle = document.getElementById("modal-title");
+  const modalCaption = document.getElementById("modal-caption");
+  const prevBtn = document.getElementById("prev-btn");
+  const nextBtn = document.getElementById("next-btn");
+
+  function updateModal() {
+    modalImg.src = data.fotos[index];
+    modalTitle.textContent = `${data.id} - ${data.name}`;
+    modalCaption.textContent = `Imagen ${index + 1} de ${data.fotos.length}`;
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === data.fotos.length - 1;
+  }
+
+  prevBtn.onclick = () => {
+    if (index > 0) {
+      index--;
+      updateModal();
+    }
+  };
+
+  nextBtn.onclick = () => {
+    if (index < data.fotos.length - 1) {
+      index++;
+      updateModal();
+    }
+  };
+
+document.getElementById("close-private-modal").addEventListener("click", () => {
+  document.getElementById("private-modal").classList.remove("active");
+});
+
+  updateModal();
+  modalBackdrop.classList.add("active");
+}
+
+
+
+
+
+
+
+
+  </script>
+
+  
+</body>
+</html>
